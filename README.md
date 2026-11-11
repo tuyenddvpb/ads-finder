@@ -2,13 +2,10 @@
 
 Tìm quảng cáo Meta đang được scale để chọn sản phẩm dropship. Chạy trên máy local, chỉ cần Python 3.10+, không phải cài thêm thư viện nào.
 
-> Nhánh `tools/ads-finder` không chung lịch sử với các nhánh theme trong repo này.
-> Không merge nhánh này vào nhánh theme, và không kết nối nó với theme nào trong Shopify.
-
 ## Chạy thử với dữ liệu mẫu
 
 ```bash
-git clone -b tools/ads-finder https://github.com/tuyenddvpb/shopify.git ads-finder
+git clone https://github.com/tuyenddvpb/ads-finder.git
 cd ads-finder
 python -m adsfinder demo
 ```
@@ -57,12 +54,13 @@ playwright install chromium
 
 File `.github/workflows/daily-scan.yml` chạy `collect`, `enrich`, `capture` mỗi ngày trên GitHub Actions rồi đăng trang web lên GitHub Pages. Repo công khai thì cả hai đều miễn phí.
 
-Workflow theo lịch chỉ chạy từ **nhánh mặc định** của repo, nên tool cần nằm ở một repo riêng:
+Cài đặt một lần trong repo này:
 
-1. Tạo repo mới trên GitHub (ví dụ `ads-finder`, công khai) và đẩy nhánh này lên làm `main`.
-2. **Settings → Secrets and variables → Actions → New repository secret**: tên `META_ACCESS_TOKEN`, giá trị là token Meta.
-3. **Settings → Pages → Source**: chọn **GitHub Actions**.
-4. **Actions → Daily ads scan → Run workflow** để chạy lượt đầu. Sau đó workflow tự chạy lúc 09:17 hằng ngày (giờ Việt Nam).
+1. **Settings → Secrets and variables → Actions → New repository secret**: tên `META_ACCESS_TOKEN`, giá trị là token Meta.
+2. **Settings → Pages → Source**: chọn **GitHub Actions**.
+3. **Actions → Daily ads scan → Run workflow** để chạy lượt đầu. Sau đó workflow tự chạy lúc 09:17 hằng ngày (giờ Việt Nam).
+
+Trang kết quả nằm ở https://tuyenddvpb.github.io/ads-finder/.
 
 Dữ liệu giữa các lượt được lưu ở nhánh `ads-data`. Để đổi từ khóa, commit một file `config.json` vào repo (bỏ dòng `config.json` trong `.gitignore`).
 
