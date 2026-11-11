@@ -24,6 +24,9 @@ CREATE TABLE IF NOT EXISTS stores (
     domain TEXT PRIMARY KEY, is_shopify INTEGER NOT NULL,
     product_count INTEGER, products TEXT, error TEXT, checked_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS media (
+    ad_id TEXT PRIMARY KEY, file TEXT NOT NULL, is_video INTEGER NOT NULL, captured_at TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_ads_page ON ads(page_id);
 """
 
@@ -82,5 +85,13 @@ def save_store(conn, domain, info, checked_at):
         "VALUES (?, ?, ?, ?, ?, ?)",
         (domain, int(info["is_shopify"]), info.get("product_count"),
          json.dumps(info.get("products") or []), info.get("error"), checked_at),
+    )
+    conn.commit()
+
+
+def save_media(conn, ad_id, file, is_video, captured_at):
+    conn.execute(
+        "INSERT OR REPLACE INTO media (ad_id, file, is_video, captured_at) VALUES (?, ?, ?, ?)",
+        (ad_id, file, int(is_video), captured_at),
     )
     conn.commit()

@@ -27,6 +27,7 @@ Mở http://127.0.0.1:8765. Dữ liệu mẫu là 50 ads thật cho từ khóa "
    ```bash
    python -m adsfinder collect    # lấy ads đang chạy
    python -m adsfinder enrich     # kiểm tra store nào là Shopify
+   python -m adsfinder capture    # chụp ảnh ad (tùy chọn, xem mục "Ảnh ad")
    python -m adsfinder serve      # mở giao diện web
    python -m adsfinder export     # xuất data/ranking.csv
    ```
@@ -40,6 +41,32 @@ Chạy `collect` mỗi ngày một lần. Tool so sánh các lượt quét để
 ```
 
 Trên Windows dùng Task Scheduler với cùng hai lệnh.
+
+## Ảnh ad
+
+`capture` mở trang xem trước của từng ad bằng trình duyệt không giao diện và chụp lại. Với ad video, ảnh là khung hình hiển thị của video và được gắn nhãn "▶ video". Mỗi lượt chỉ chụp một ad (ad chạy lâu nhất) cho các sản phẩm điểm cao nhất; số lượng đặt ở `images_top_groups` trong config.
+
+Phần này cần cài thêm Playwright:
+
+```bash
+pip install playwright
+playwright install chromium
+```
+
+## Chạy tự động miễn phí trên GitHub
+
+File `.github/workflows/daily-scan.yml` chạy `collect`, `enrich`, `capture` mỗi ngày trên GitHub Actions rồi đăng trang web lên GitHub Pages. Repo công khai thì cả hai đều miễn phí.
+
+Workflow theo lịch chỉ chạy từ **nhánh mặc định** của repo, nên tool cần nằm ở một repo riêng:
+
+1. Tạo repo mới trên GitHub (ví dụ `ads-finder`, công khai) và đẩy nhánh này lên làm `main`.
+2. **Settings → Secrets and variables → Actions → New repository secret**: tên `META_ACCESS_TOKEN`, giá trị là token Meta.
+3. **Settings → Pages → Source**: chọn **GitHub Actions**.
+4. **Actions → Daily ads scan → Run workflow** để chạy lượt đầu. Sau đó workflow tự chạy lúc 09:17 hằng ngày (giờ Việt Nam).
+
+Dữ liệu giữa các lượt được lưu ở nhánh `ads-data`. Để đổi từ khóa, commit một file `config.json` vào repo (bỏ dòng `config.json` trong `.gitignore`).
+
+Lưu ý: trang GitHub Pages của repo công khai ai có link cũng xem được. Token dài hạn của Meta hết hạn sau khoảng 60 ngày; khi đó workflow báo lỗi qua email và bạn cần cập nhật secret.
 
 ## Lấy token Meta
 

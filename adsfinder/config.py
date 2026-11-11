@@ -12,6 +12,7 @@ DEFAULTS = {
     "exclude_terms": ["med spa", "medspa", "spa", "clinic", "salon", "facial", "properties", "real estate", "appointment", "retreats"],
     "db_path": "data/ads.db",
     "port": 8765,
+    "images_top_groups": 60,
 }
 
 

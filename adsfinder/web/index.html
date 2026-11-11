@@ -61,6 +61,15 @@ tr.detail td { background: var(--bg); padding: 14px 18px 18px; }
 .adlist li { margin-bottom: 4px; break-inside: avoid; }
 .body { color: var(--muted); font-size: 13px; margin: 0 0 10px; white-space: pre-wrap; }
 h3 { font-size: 12px; margin: 0 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.thumb { width: 72px; height: 72px; border-radius: 8px; object-fit: cover; object-position: top; display: block;
+  background: var(--bar); border: 1px solid var(--line); }
+.thumb.none { display: grid; place-items: center; color: var(--muted); font-size: 11px; }
+.thumb-wrap { position: relative; width: 72px; }
+.play { position: absolute; right: 4px; bottom: 4px; font-size: 10px; padding: 1px 5px; border-radius: 4px;
+  background: rgba(0, 0, 0, .7); color: #fff; }
+.shots { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.shots a { display: block; position: relative; }
+.shots img { width: 260px; max-width: 100%; border-radius: 10px; border: 1px solid var(--line); display: block; }
 .empty { padding: 40px; text-align: center; color: var(--muted); }
 </style>
 </head>
@@ -90,6 +99,7 @@ h3 { font-size: 12px; margin: 0 0 8px; color: var(--muted); font-weight: 600; te
 <script>
 const COLUMNS = [
   { key: "score", label: "Điểm", sort: true },
+  { key: "image", label: "Ảnh ad" },
   { key: "title", label: "Sản phẩm / Page" },
   { key: "n_active", label: "Ads đang chạy", sort: true, num: true },
   { key: "max_days", label: "Ngày chạy", sort: true, num: true },
@@ -149,6 +159,14 @@ function renderHead() {
   }));
 }
 
+function thumbCell(g) {
+  if (!g.image) return el("td", {}, el("div", { class: "thumb none", text: "chưa có" }));
+  const wrap = el("div", { class: "thumb-wrap" },
+    el("img", { class: "thumb", src: "images/" + encodeURIComponent(g.image), loading: "lazy", alt: "Ảnh ad: " + (g.title || g.page_name) }));
+  if (g.is_video) wrap.append(el("span", { class: "play", text: "▶ video" }));
+  return el("td", {}, wrap);
+}
+
 function storeCell(g) {
   const td = el("td");
   if (!g.domain) { td.append(el("span", { class: "sub", text: "–" })); return td; }
@@ -180,6 +198,17 @@ function detailRow(g) {
   parts.append(el("div", { class: "sub", text: "Page này đang chạy tổng cộng " + fmt(g.page_active_ads) + " ads trong dữ liệu." }));
 
   const right = el("div");
+  const shots = g.ads.filter((ad) => ad.image);
+  if (shots.length) {
+    const box = el("div", { class: "shots" });
+    for (const ad of shots) {
+      const a = link(ad.snapshot_url, "");
+      a.append(el("img", { src: "images/" + encodeURIComponent(ad.image), loading: "lazy", alt: "Ảnh chụp ad " + ad.id }));
+      if (ad.is_video) a.append(el("span", { class: "play", text: "▶ video" }));
+      box.append(a);
+    }
+    right.append(box);
+  }
   if (g.body) right.append(el("p", { class: "body", text: g.body }));
   right.append(el("h3", { text: "Các ads (" + g.ads.length + ")" }));
   const list = el("ul", { class: "adlist" });
@@ -204,7 +233,7 @@ function render() {
       el("div", { class: "sub", text: g.page_name + (g.currency ? " · " + g.currency : "") }));
     if (g.excluded) titleCell.append(el("span", { class: "tag warn", text: "nhiễu" }));
     if (g.n_active === 0) titleCell.append(el("span", { class: "tag warn", text: "đã dừng" }));
-    const tr = el("tr", { class: "group" + (g.excluded || g.n_active === 0 ? " dim" : "") }, scoreCell, titleCell,
+    const tr = el("tr", { class: "group" + (g.excluded || g.n_active === 0 ? " dim" : "") }, scoreCell, thumbCell(g), titleCell,
       el("td", { class: "num", text: fmt(g.n_active) }), el("td", { class: "num", text: fmt(g.max_days) }),
       el("td", { class: "num", text: fmt(g.new_7d) }), el("td", { class: "num", text: fmt(g.reach) }),
       el("td", {}, ...g.countries.map((c) => el("span", { class: "tag", text: c }))), storeCell(g));
@@ -237,7 +266,7 @@ function fill(select, values) {
 
 async function load() {
   try {
-    const res = await fetch("/api/data");
+    const res = await fetch("data.json", { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     state.data = await res.json();
   } catch (err) {

@@ -8,7 +8,9 @@
     "DE",
     "FR",
     "NL",
-    "GB"
+    "GB",
+    "IT",
+    "ES"
   ],
   "api_version": "v24.0",
   "page_size": 50,
@@ -26,5 +28,6 @@
     "retreats"
   ],
   "db_path": "data/ads.db",
-  "port": 8765
+  "port": 8765,
+  "images_top_groups": 60
 }

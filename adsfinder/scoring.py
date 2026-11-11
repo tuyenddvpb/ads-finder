@@ -59,6 +59,7 @@ def build_groups(conn, exclude_terms=()):
     for r in conn.execute("SELECT ad_id, keyword, country FROM ad_hits"):
         hits[r["ad_id"]].append((r["keyword"], r["country"]))
     stores = {r["domain"]: r for r in conn.execute("SELECT * FROM stores")}
+    media = {r["ad_id"]: r for r in conn.execute("SELECT * FROM media")}
     # Khớp theo nguyên từ để "spa" không dính "space".
     terms = [re.escape(t.strip().lower()) for t in exclude_terms if t.strip()]
     exclude = re.compile(r"\b(?:" + "|".join(terms) + r")\b") if terms else None
@@ -119,10 +120,15 @@ def build_groups(conn, exclude_terms=()):
             "excluded": bool(exclude and exclude.search(haystack)),
             "ads": [
                 {"id": a["id"], "start_at": a["start_at"], "days": a["days"], "active": a["active"],
-                 "reach": a["reach"], "snapshot_url": a["snapshot_url"]}
+                 "reach": a["reach"], "snapshot_url": a["snapshot_url"],
+                 "image": media[a["id"]]["file"] if a["id"] in media else None,
+                 "is_video": bool(media[a["id"]]["is_video"]) if a["id"] in media else False}
                 for a in sorted(ads, key=lambda a: a["start_at"] or "")
             ],
         }
+        shot = next((a for a in group["ads"] if a["image"]), None)
+        group["image"] = shot and shot["image"]
+        group["is_video"] = bool(shot and shot["is_video"])
         store = stores.get(domain) if domain else None
         if store:
             products = json.loads(store["products"] or "[]")

@@ -1,0 +1,74 @@
+# Quét ads hằng ngày và đăng kết quả lên GitHub Pages.
+# Workflow theo lịch chỉ chạy khi file này nằm trên nhánh mặc định của repo.
+name: Daily ads scan
+
+on:
+  schedule:
+    - cron: "17 2 * * *"   # 09:17 giờ Việt Nam
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: ads-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dùng config mẫu nếu chưa có config.json
+        run: test -f config.json || cp config.example.json config.json
+
+      - name: Lấy lại dữ liệu của các lượt trước
+        run: |
+          mkdir -p data
+          if git fetch --depth 1 origin ads-data 2>/dev/null; then
+            git archive FETCH_HEAD | tar -x -C data
+          fi
+
+      - name: Thu thập ads
+        run: python -m adsfinder collect
+
+      - name: Kiểm tra store Shopify
+        run: python -m adsfinder enrich
+
+      - name: Chụp ảnh ads
+        run: |
+          pip install --quiet playwright
+          playwright install --with-deps chromium
+          python -m adsfinder capture
+
+      - name: Lưu dữ liệu vào nhánh ads-data
+        run: |
+          cd data
+          git init -q -b ads-data
+          git add -A
+          git -c user.name="ads-finder" -c user.email="actions@users.noreply.github.com" commit -qm "Data $(date -u +%F)"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" ads-data
+          rm -rf .git
+
+      - name: Xuất trang web
+        run: python -m adsfinder build --out site
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

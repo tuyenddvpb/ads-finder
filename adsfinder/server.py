@@ -1,5 +1,7 @@
 """Web server local để xem kết quả."""
 import json
+import re
+import shutil
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -8,6 +10,28 @@ from . import db
 from .scoring import WEIGHTS, build_groups
 
 INDEX = Path(__file__).parent / "web" / "index.html"
+IMAGE_RE = re.compile(r"^/images/(\d+\.jpg)$")
+
+
+def images_dir(db_path):
+    return Path(db_path).parent / "images"
+
+
+def build_site(conn, db_path, exclude_terms, out_dir):
+    """Xuất trang web tĩnh (index.html, data.json, images/) để đưa lên hosting tĩnh."""
+    out = Path(out_dir)
+    (out / "images").mkdir(parents=True, exist_ok=True)
+    payload = build_payload(conn, exclude_terms)
+    copied = 0
+    for group in payload["groups"]:
+        for ad in group["ads"]:
+            src = images_dir(db_path) / ad["image"] if ad["image"] else None
+            if src and src.exists():
+                shutil.copyfile(src, out / "images" / ad["image"])
+                copied += 1
+    shutil.copyfile(INDEX, out / "index.html")
+    (out / "data.json").write_text(json.dumps(payload), encoding="utf-8")
+    return len(payload["groups"]), copied
 
 
 def build_payload(conn, exclude_terms):
@@ -38,7 +62,13 @@ def make_handler(db_path, exclude_terms):
             path = self.path.split("?", 1)[0]
             if path in ("/", "/index.html"):
                 self._send(200, INDEX.read_bytes(), "text/html; charset=utf-8")
-            elif path == "/api/data":
+            elif IMAGE_RE.match(path):
+                file = images_dir(db_path) / IMAGE_RE.match(path).group(1)
+                if file.exists():
+                    self._send(200, file.read_bytes(), "image/jpeg")
+                else:
+                    self._send(404, b"Not found", "text/plain; charset=utf-8")
+            elif path == "/data.json":
                 conn = db.connect(db_path)
                 try:
                     payload = build_payload(conn, exclude_terms)

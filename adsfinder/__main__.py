@@ -13,7 +13,8 @@ from .config import load_config, load_env
 from .meta_api import MetaApiError, search_ads
 from .normalize import normalize_ad, to_iso
 from .scoring import build_groups
-from .server import serve
+from .capture import CaptureUnavailable, capture_ads
+from .server import build_site, images_dir, serve
 from .shopify import check_store
 
 SAMPLE = Path(__file__).parent.parent / "samples" / "red-light-therapy-2026-11-11.json"
@@ -107,6 +108,40 @@ def cmd_export(cfg, args):
     print(f"Đã ghi {len(groups)} dòng vào {args.out}")
 
 
+def cmd_capture(cfg, args):
+    token = os.environ.get("META_ACCESS_TOKEN", "").strip()
+    if not token:
+        sys.exit("Thiếu META_ACCESS_TOKEN. Sao chép .env.example thành .env rồi điền token.")
+    conn = db.connect(cfg["db_path"])
+    groups = [g for g in build_groups(conn, cfg["exclude_terms"]) if g["n_active"] and not g["excluded"]]
+    limit = args.limit or cfg["images_top_groups"]
+    # Mỗi sản phẩm chụp một ad: ad đang chạy lâu nhất.
+    wanted = [next(a for a in g["ads"] if a["active"])["id"] for g in groups[:limit] if not g["image"]]
+    if not wanted:
+        print("Không có ad nào cần chụp.")
+        return
+    try:
+        done = capture_ads(wanted, token, images_dir(cfg["db_path"]),
+                           executable_path=os.environ.get("CHROMIUM_PATH"),
+                           **({"render_url": args.render_url} if args.render_url else {}))
+    except CaptureUnavailable as exc:
+        sys.exit(str(exc))
+    for ad_id, info in done.items():
+        db.save_media(conn, ad_id, info["file"], info["is_video"], now_iso())
+    conn.close()
+    print(f"Đã chụp {len(done)}/{len(wanted)} ads.")
+    if not done:
+        # Chỉ cảnh báo: thiếu ảnh không nên làm hỏng cả lượt quét hằng ngày.
+        print("Không chụp được ad nào. Nếu lặp lại nhiều ngày, kiểm tra token.", file=sys.stderr)
+
+
+def cmd_build(cfg, args):
+    conn = db.connect(cfg["db_path"])
+    n_groups, n_images = build_site(conn, cfg["db_path"], cfg["exclude_terms"], args.out)
+    conn.close()
+    print(f"Đã xuất {n_groups} sản phẩm và {n_images} ảnh vào {args.out}/")
+
+
 def cmd_serve(cfg, args):
     serve(cfg["db_path"], cfg["exclude_terms"], args.port or cfg["port"])
 
@@ -146,6 +181,15 @@ def main(argv=None):
     p = sub.add_parser("export", help="Xuất bảng xếp hạng ra CSV")
     p.add_argument("--out", default="data/ranking.csv")
     p.set_defaults(func=cmd_export)
+
+    p = sub.add_parser("capture", help="Chụp ảnh ad cho các sản phẩm điểm cao nhất (cần Playwright)")
+    p.add_argument("--limit", type=int, help="Số sản phẩm cần có ảnh; mặc định lấy từ config")
+    p.add_argument("--render-url", help=argparse.SUPPRESS)
+    p.set_defaults(func=cmd_capture)
+
+    p = sub.add_parser("build", help="Xuất trang web tĩnh để đưa lên hosting")
+    p.add_argument("--out", default="site")
+    p.set_defaults(func=cmd_build)
 
     p = sub.add_parser("serve", help="Mở giao diện web")
     p.add_argument("--port", type=int)

@@ -113,5 +113,31 @@ class MiscTest(unittest.TestCase):
         self.assertEqual(calls[1], "next-1")
 
 
+
+class SiteTest(unittest.TestCase):
+    def test_build_site_copies_only_captured_images(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        from adsfinder.server import build_site, images_dir
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = str(Path(tmp) / "data" / "ads.db")
+            conn = db.connect(db_path)
+            db.save_ads(conn, [ad("1"), ad("2", title="Other")], "kw", "DE", RUN1)
+            images_dir(db_path).mkdir()
+            (images_dir(db_path) / "1.jpg").write_bytes(b"jpg")
+            (images_dir(db_path) / "999.jpg").write_bytes(b"orphan")
+            db.save_media(conn, "1", "1.jpg", True, RUN1)
+            out = Path(tmp) / "site"
+            self.assertEqual(build_site(conn, db_path, [], out), (2, 1))
+            conn.close()
+            self.assertEqual([p.name for p in (out / "images").iterdir()], ["1.jpg"])
+            groups = {g["title"]: g for g in json.loads((out / "data.json").read_text())["groups"]}
+            self.assertEqual((groups["Red Light Wrap"]["image"], groups["Red Light Wrap"]["is_video"]), ("1.jpg", True))
+            self.assertIsNone(groups["Other"]["image"])
+            self.assertTrue((out / "index.html").exists())
+
 if __name__ == "__main__":
     unittest.main()
