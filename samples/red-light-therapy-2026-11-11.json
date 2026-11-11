@@ -1,0 +1,261 @@
+{
+ "keyword": "red light therapy",
+ "countries": [
+  "US"
+ ],
+ "source": "meta_connector",
+ "collected_at": "2026-11-11T04:40:00+00:00",
+ "note": "Dữ liệu thật từ Meta Ad Library, 25 ads mới nhất mỗi thị trường tại thời điểm thu thập.",
+ "ads": [
+  {
+   "id": "1475038464394768",
+   "page_id": "1197096903486208",
+   "page_name": "Peadic",
+   "ad_creative_link_title": "NEW Carpal Tunnel Relief",
+   "ad_creation_time": 1782204088,
+   "ad_delivery_start_time": 1782401558,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1475038464394768",
+   "currency": "EUR"
+  },
+  {
+   "id": "1634654588449195",
+   "page_id": "1047593375094338",
+   "page_name": "Vitality Ash - Realistic Holistic ER RN",
+   "ad_creative_link_title": "Everyday Science-Backed Joint Recovery",
+   "ad_creation_time": 1791564935,
+   "ad_delivery_start_time": 1791807754,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1634654588449195",
+   "currency": "USD"
+  },
+  {
+   "id": "1449749657130863",
+   "page_id": "1047593375094338",
+   "page_name": "Vitality Ash - Realistic Holistic ER RN",
+   "ad_creative_link_title": "Everyday Science-Backed Joint Recovery",
+   "ad_creation_time": 1791564935,
+   "ad_delivery_start_time": 1791808091,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1449749657130863",
+   "currency": "USD"
+  },
+  {
+   "id": "29154516904236795",
+   "page_id": "102121663865204",
+   "page_name": "Kristin Olenik",
+   "ad_creative_link_title": "Simple Everyday Recovery",
+   "ad_creation_time": 1791839625,
+   "ad_delivery_start_time": 1791991872,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=29154516904236795",
+   "currency": "USD"
+  },
+  {
+   "id": "1434003038378082",
+   "page_id": "1503645236586955",
+   "page_name": "Crepe Erase",
+   "ad_creative_link_title": "It’s Time to Treat Crepey Skin Differently.",
+   "ad_creation_time": 1794265352,
+   "ad_delivery_start_time": 1794345988,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1434003038378082",
+   "currency": "USD"
+  },
+  {
+   "id": "1565607381945117",
+   "page_id": "801368406673736",
+   "page_name": "SRI Labs",
+   "ad_creative_link_title": "Featured on GMA: $234.99 | Featured on GMA: $234.99",
+   "ad_creation_time": 1794365190,
+   "ad_delivery_start_time": 1794369624,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1565607381945117",
+   "currency": "USD"
+  },
+  {
+   "id": "3551953394973450",
+   "page_id": "166696246516276",
+   "page_name": "Medspa810 Burlington",
+   "ad_creative_link_title": "👉 Turkey Neck Rescue $197 (Usually $500)",
+   "ad_creation_time": 1794364357,
+   "ad_delivery_start_time": 1794369407,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=3551953394973450",
+   "currency": "USD"
+  },
+  {
+   "id": "1120026324246316",
+   "page_id": "105838161569893",
+   "page_name": "Step.In.Confidence",
+   "ad_creative_link_title": "DAY 3! SIC DEALS & STEALS! TAKE 2",
+   "ad_creation_time": 1794363876,
+   "ad_delivery_start_time": 1794368165,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1120026324246316",
+   "currency": "USD"
+  },
+  {
+   "id": "1665514158570343",
+   "page_id": "454389431099917",
+   "page_name": "Heavenly Heat Saunas",
+   "ad_creative_link_title": "The 2,000 year old habit cardiologists keep getting asked about",
+   "ad_creation_time": 1794363820,
+   "ad_delivery_start_time": 1794368994,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1665514158570343",
+   "currency": "USD"
+  },
+  {
+   "id": "1987385315553413",
+   "page_id": "104076061311687",
+   "page_name": "The Lymphatic Circle",
+   "ad_creative_link_title": "🌿 Don’t Blame Your Lifestyle — Fix The Lymphatic System First",
+   "ad_creation_time": 1794363497,
+   "ad_delivery_start_time": 1794369081,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1987385315553413",
+   "currency": "USD"
+  },
+  {
+   "id": "2146687525925792",
+   "page_id": "1254553271067080",
+   "page_name": "Serenity Spa & Facials US",
+   "ad_creative_link_title": "Serenity Spa & Facials US | Jawline & Neck Sculpting Facial | 01 · Radio Frequency | 02 · Microcurrent Sculpting | 03 · Red Light Therapy | Non-invasive. No downtime. | Claim your $69 facial",
+   "ad_creation_time": 1794363479,
+   "ad_delivery_start_time": 1794368385,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2146687525925792",
+   "currency": "USD"
+  },
+  {
+   "id": "1845950556548928",
+   "page_id": "454389431099917",
+   "page_name": "Heavenly Heat Saunas",
+   "ad_creative_link_title": "Zero-Glue Construction 🇺🇸 Your Sign for No-Brainer Investment in Your Health!",
+   "ad_creation_time": 1794363396,
+   "ad_delivery_start_time": 1794368599,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1845950556548928",
+   "currency": "USD"
+  },
+  {
+   "id": "1809489053675646",
+   "page_id": "454389431099917",
+   "page_name": "Heavenly Heat Saunas",
+   "ad_creative_link_title": "Zero-Glue Construction 🇺🇸 Your Sign for No-Brainer Investment in Your Health!",
+   "ad_creation_time": 1794363396,
+   "ad_delivery_start_time": 1794369390,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1809489053675646",
+   "currency": "USD"
+  },
+  {
+   "id": "1187922354189234",
+   "page_id": "1254553271067080",
+   "page_name": "Serenity Spa & Facials US",
+   "ad_creative_link_title": "Serenity Spa & Facials US | Jawline & Neck Sculpting Facial | 01 · Radio Frequency | 02 · Microcurrent Sculpting | 03 · Red Light Therapy | Non-invasive. No downtime. | Claim your $69 facial",
+   "ad_creation_time": 1794362808,
+   "ad_delivery_start_time": 1794367806,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1187922354189234",
+   "currency": "USD"
+  },
+  {
+   "id": "1169162492748200",
+   "page_id": "652398924629220",
+   "page_name": "Desert Rose Med Spa",
+   "ad_creative_link_title": "Red Light Therapy Intro Special — Only $59!",
+   "ad_creation_time": 1794360866,
+   "ad_delivery_start_time": 1794366178,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1169162492748200",
+   "currency": "USD"
+  },
+  {
+   "id": "2400189847052667",
+   "page_id": "652398924629220",
+   "page_name": "Desert Rose Med Spa",
+   "ad_creative_link_title": "Red Light Therapy Intro Special — Only $59!",
+   "ad_creation_time": 1794360862,
+   "ad_delivery_start_time": 1794366382,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2400189847052667",
+   "currency": "USD"
+  },
+  {
+   "id": "2071190996916066",
+   "page_id": "652398924629220",
+   "page_name": "Desert Rose Med Spa",
+   "ad_creative_link_title": "Red Light Therapy Intro Special — Only $59!",
+   "ad_creation_time": 1794360861,
+   "ad_delivery_start_time": 1794365893,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2071190996916066",
+   "currency": "USD"
+  },
+  {
+   "id": "3897178340422397",
+   "page_id": "135936979607227",
+   "page_name": "arch2arch_forum",
+   "ad_creative_link_title": "Arch2Arch - Forum Official: Facebook | Linktree",
+   "ad_creation_time": 1794360646,
+   "ad_delivery_start_time": 1794365288,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=3897178340422397",
+   "currency": "USD"
+  },
+  {
+   "id": "1815802642797026",
+   "page_id": "326022960592409",
+   "page_name": "LED Therapy Review",
+   "ad_creative_link_title": "Here’s what you need to know.",
+   "ad_creation_time": 1794360411,
+   "ad_delivery_start_time": 1794365394,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1815802642797026",
+   "currency": "USD"
+  },
+  {
+   "id": "1492391716420480",
+   "page_id": "417424474795385",
+   "page_name": "Derma Beauty Hacks",
+   "ad_creative_link_title": "Uncover Best LED Mask | Uncover Best LED Mask | Uncover Best LED Mask",
+   "ad_creation_time": 1794360410,
+   "ad_delivery_start_time": 1794365097,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1492391716420480",
+   "currency": "USD"
+  },
+  {
+   "id": "890544724085128",
+   "page_id": "326022960592409",
+   "page_name": "LED Therapy Review",
+   "ad_creative_link_title": "Here’s what you need to know.",
+   "ad_creation_time": 1794360410,
+   "ad_delivery_start_time": 1794365664,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=890544724085128",
+   "currency": "USD"
+  },
+  {
+   "id": "1653689806402942",
+   "page_id": "417424474795385",
+   "page_name": "Derma Beauty Hacks",
+   "ad_creative_link_title": "Here’s what you need to know. | Here’s what you need to know. | Here’s what you need to know.",
+   "ad_creation_time": 1794360410,
+   "ad_delivery_start_time": 1794366514,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1653689806402942",
+   "currency": "USD"
+  },
+  {
+   "id": "1042567931575339",
+   "page_id": "417424474795385",
+   "page_name": "Derma Beauty Hacks",
+   "ad_creative_link_title": "Uncover Best LED Mask",
+   "ad_creation_time": 1794360409,
+   "ad_delivery_start_time": 1794365136,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1042567931575339",
+   "currency": "USD"
+  },
+  {
+   "id": "28861442116883302",
+   "page_id": "326022960592409",
+   "page_name": "LED Therapy Review",
+   "ad_creative_link_title": "Not All LED Masks Are Created Equal",
+   "ad_creation_time": 1794360409,
+   "ad_delivery_start_time": 1794365541,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=28861442116883302",
+   "currency": "USD"
+  },
+  {
+   "id": "1163736646610719",
+   "page_id": "417424474795385",
+   "page_name": "Derma Beauty Hacks",
+   "ad_creative_link_title": "LED Mask Showdown: Omnilux vs Glotech",
+   "ad_creation_time": 1794360409,
+   "ad_delivery_start_time": 1794366095,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1163736646610719",
+   "currency": "USD"
+  }
+ ]
+}

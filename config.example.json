@@ -1,0 +1,30 @@
+{
+  "keywords": [
+    "red light therapy",
+    "posture corrector",
+    "heated gloves"
+  ],
+  "countries": [
+    "DE",
+    "FR",
+    "NL",
+    "GB"
+  ],
+  "api_version": "v24.0",
+  "page_size": 50,
+  "max_pages_per_query": 4,
+  "exclude_terms": [
+    "med spa",
+    "medspa",
+    "spa",
+    "clinic",
+    "salon",
+    "facial",
+    "properties",
+    "real estate",
+    "appointment",
+    "retreats"
+  ],
+  "db_path": "data/ads.db",
+  "port": 8765
+}

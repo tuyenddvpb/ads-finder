@@ -1,0 +1,263 @@
+{
+ "keyword": "red light therapy",
+ "countries": [
+  "DE",
+  "FR",
+  "NL"
+ ],
+ "source": "meta_connector",
+ "collected_at": "2026-11-11T04:40:00+00:00",
+ "note": "Dữ liệu thật từ Meta Ad Library, 25 ads mới nhất mỗi thị trường tại thời điểm thu thập.",
+ "ads": [
+  {
+   "id": "1599502058148005",
+   "page_id": "103682658685753",
+   "page_name": "MITO LIGHT Europe",
+   "ad_creative_link_title": "The new MITO LIGHT 5.0 generation",
+   "ad_creation_time": 1794353582,
+   "ad_delivery_start_time": 1794358608,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1599502058148005",
+   "currency": "EUR"
+  },
+  {
+   "id": "3761713523992094",
+   "page_id": "103682658685753",
+   "page_name": "MITO LIGHT Europe",
+   "ad_creative_link_title": "The new MITO LIGHT 5.0 generation",
+   "ad_creation_time": 1794353577,
+   "ad_delivery_start_time": 1794358815,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=3761713523992094",
+   "currency": "EUR"
+  },
+  {
+   "id": "1426666912785310",
+   "page_id": "1413129538551879",
+   "page_name": "Glowyourskin",
+   "ad_creative_link_title": "Red Light LED Face Mask – €48.99",
+   "ad_creation_time": 1794351581,
+   "ad_delivery_start_time": 1794359321,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1426666912785310",
+   "currency": "EUR"
+  },
+  {
+   "id": "1691001189257188",
+   "page_id": "1413129538551879",
+   "page_name": "Glowyourskin",
+   "ad_creative_link_title": "Red Light LED Face Mask – €48.99",
+   "ad_creation_time": 1794351581,
+   "ad_delivery_start_time": 1794359278,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1691001189257188",
+   "currency": "EUR"
+  },
+  {
+   "id": "1477149001147757",
+   "page_id": "112362105453319",
+   "page_name": "CÔTÉ CŒUR",
+   "ad_creative_link_title": "DETOX & GLOW in Deidesheim",
+   "ad_creation_time": 1794349074,
+   "ad_delivery_start_time": 1794362565,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1477149001147757",
+   "currency": "EUR"
+  },
+  {
+   "id": "1478395537520108",
+   "page_id": "112362105453319",
+   "page_name": "CÔTÉ CŒUR",
+   "ad_creative_link_title": "DETOX & GLOW in Deidesheim",
+   "ad_creation_time": 1794349002,
+   "ad_delivery_start_time": 1794365548,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1478395537520108",
+   "currency": "EUR"
+  },
+  {
+   "id": "1690261642719754",
+   "page_id": "112362105453319",
+   "page_name": "CÔTÉ CŒUR",
+   "ad_creative_link_title": "Beauty-Retreats in Deidesheim",
+   "ad_creation_time": 1794348999,
+   "ad_delivery_start_time": 1794369217,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1690261642719754",
+   "currency": "EUR"
+  },
+  {
+   "id": "1561926729075456",
+   "page_id": "105387342324963",
+   "page_name": "Zuneya",
+   "ad_creative_link_title": "Healthy hair starts at the root",
+   "ad_creation_time": 1794345776,
+   "ad_delivery_start_time": 1794351684,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1561926729075456",
+   "currency": "USD"
+  },
+  {
+   "id": "1830133594660707",
+   "page_id": "105387342324963",
+   "page_name": "Zuneya",
+   "ad_creative_link_title": "Healthy hair starts at the root",
+   "ad_creation_time": 1794345650,
+   "ad_delivery_start_time": 1794351351,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1830133594660707",
+   "currency": "USD"
+  },
+  {
+   "id": "1141994445470996",
+   "page_id": "105387342324963",
+   "page_name": "Zuneya",
+   "ad_creative_link_title": "Healthy hair starts at the root",
+   "ad_creation_time": 1794345581,
+   "ad_delivery_start_time": 1794351277,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1141994445470996",
+   "currency": "USD"
+  },
+  {
+   "id": "1506977161491777",
+   "page_id": "1360193787168688",
+   "page_name": "Fsgtek LED RED Light 03",
+   "ad_creative_link_title": "Factory Direct | High Power Portable Beauty Light on Rolling Casters – Distributors Wanted-OEM/ODM Service",
+   "ad_creation_time": 1794343785,
+   "ad_delivery_start_time": 1794348709,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1506977161491777",
+   "currency": "USD"
+  },
+  {
+   "id": "2209560046441665",
+   "page_id": "1360193787168688",
+   "page_name": "Fsgtek LED RED Light 03",
+   "ad_creative_link_title": "Factory Direct | High Power Full-Body Beauty Light on Rolling Casters – Distributors Wanted-OEM/ODM Service",
+   "ad_creation_time": 1794343785,
+   "ad_delivery_start_time": 1794348650,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2209560046441665",
+   "currency": "USD"
+  },
+  {
+   "id": "1579666410824911",
+   "page_id": "1360193787168688",
+   "page_name": "Fsgtek LED RED Light 03",
+   "ad_creative_link_title": "Factory Direct | High Power Portable Beauty Light on Rolling Casters – Distributors Wanted-OEM/ODM Service",
+   "ad_creation_time": 1794343753,
+   "ad_delivery_start_time": 1794348914,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1579666410824911",
+   "currency": "USD"
+  },
+  {
+   "id": "1192348670024304",
+   "page_id": "1058740747316386",
+   "page_name": "Christina Cheng Offplan Dubai",
+   "ad_creative_link_title": "",
+   "ad_creation_time": 1794341330,
+   "ad_delivery_start_time": 1794346349,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1192348670024304",
+   "currency": "AED"
+  },
+  {
+   "id": "1457837409013245",
+   "page_id": "1025191567351283",
+   "page_name": "Habico Properties",
+   "ad_creative_link_title": "Studios starting from AED 1.65M  ($450,000)",
+   "ad_creation_time": 1794338142,
+   "ad_delivery_start_time": 1794343386,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1457837409013245",
+   "currency": "AED"
+  },
+  {
+   "id": "1507115564588017",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794332828,
+   "ad_delivery_start_time": 1794339514,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1507115564588017",
+   "currency": "USD"
+  },
+  {
+   "id": "1144856984584062",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794332822,
+   "ad_delivery_start_time": 1794342546,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1144856984584062",
+   "currency": "USD"
+  },
+  {
+   "id": "1692243762345895",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323753,
+   "ad_delivery_start_time": 1794330334,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1692243762345895",
+   "currency": "USD"
+  },
+  {
+   "id": "2264961480715573",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323727,
+   "ad_delivery_start_time": 1794332901,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2264961480715573",
+   "currency": "USD"
+  },
+  {
+   "id": "4627631364229995",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323665,
+   "ad_delivery_start_time": 1794331758,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=4627631364229995",
+   "currency": "USD"
+  },
+  {
+   "id": "3039506863065352",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323595,
+   "ad_delivery_start_time": 1794334265,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=3039506863065352",
+   "currency": "USD"
+  },
+  {
+   "id": "1152028467297697",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323552,
+   "ad_delivery_start_time": 1794335064,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1152028467297697",
+   "currency": "USD"
+  },
+  {
+   "id": "1784515222773664",
+   "page_id": "695828743618419",
+   "page_name": "RubyBeam US",
+   "ad_creative_link_title": "30% OFF — Red Light Waist Wrap",
+   "ad_creation_time": 1794323502,
+   "ad_delivery_start_time": 1794359031,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1784515222773664",
+   "currency": "USD"
+  },
+  {
+   "id": "2744845795933876",
+   "page_id": "102089366262116",
+   "page_name": "Sculptura360",
+   "ad_creative_link_title": "90 Day Money Back Guarantee!",
+   "ad_creation_time": 1794321851,
+   "ad_delivery_start_time": 1794329637,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=2744845795933876",
+   "currency": "USD"
+  },
+  {
+   "id": "1431637651961279",
+   "page_id": "599290360251441",
+   "page_name": "Flowlife",
+   "ad_creative_link_title": "Red Light Therapy at home.",
+   "ad_creation_time": 1794320209,
+   "ad_delivery_start_time": 1794332876,
+   "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1431637651961279",
+   "currency": "SEK"
+  }
+ ]
+}

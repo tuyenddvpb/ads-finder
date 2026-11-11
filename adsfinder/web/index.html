@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ads Finder</title>
+<style>
+:root {
+  --bg: #f6f5f1; --panel: #ffffff; --line: #e3e0d8; --text: #1d2422; --muted: #66706c;
+  --accent: #2f6b55; --accent-soft: #dfece6; --warn: #b4572e; --bar: #e9e6de;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141917; --panel: #1c2320; --line: #2c3531; --text: #e8ece9; --muted: #98a39e;
+    --accent: #6fc3a1; --accent-soft: #24382f; --warn: #e39468; --bar: #2a322e;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 20px 24px 8px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px; }
+h1 { margin: 0; font-size: 20px; }
+.meta { color: var(--muted); font-size: 13px; }
+.stats { display: flex; flex-wrap: wrap; gap: 12px; padding: 8px 24px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; min-width: 130px; }
+.stat b { display: block; font-size: 20px; }
+.stat span { color: var(--muted); font-size: 12px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; padding: 12px 24px; }
+.filters label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.filters label.check { flex-direction: row; align-items: center; gap: 6px; font-size: 13px; color: var(--text); padding-bottom: 7px; }
+input[type=search], input[type=number], select {
+  font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 9px; }
+input[type=search] { width: 220px; }
+input[type=number] { width: 84px; }
+.wrap { padding: 4px 24px 40px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; font-weight: 600; color: var(--muted); white-space: nowrap; background: var(--panel); }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover, th.sorted { color: var(--text); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.group { cursor: pointer; }
+tr.group:hover { background: var(--accent-soft); }
+tr.dim td { opacity: .55; }
+.score { display: flex; align-items: center; gap: 8px; min-width: 96px; }
+.score b { width: 26px; text-align: right; font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 6px; border-radius: 3px; background: var(--bar); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.title { font-weight: 600; max-width: 420px; overflow-wrap: anywhere; }
+.sub { color: var(--muted); font-size: 12px; }
+.tag { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent); margin: 0 4px 2px 0; white-space: nowrap; }
+.tag.warn { background: transparent; border: 1px solid var(--warn); color: var(--warn); }
+a { color: var(--accent); }
+tr.detail td { background: var(--bg); padding: 14px 18px 18px; }
+.detail-grid { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 24px; }
+@media (max-width: 760px) { .detail-grid { grid-template-columns: 1fr; } }
+.part { display: grid; grid-template-columns: 130px 1fr 44px; gap: 8px; align-items: center; font-size: 12px; margin-bottom: 6px; }
+.adlist { margin: 0; padding: 0; list-style: none; columns: 2 260px; font-size: 12px; }
+.adlist li { margin-bottom: 4px; break-inside: avoid; }
+.body { color: var(--muted); font-size: 13px; margin: 0 0 10px; white-space: pre-wrap; }
+h3 { font-size: 12px; margin: 0 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.empty { padding: 40px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ads Finder</h1>
+  <span class="meta" id="meta">Đang tải…</span>
+</header>
+<section class="stats" id="stats"></section>
+<section class="filters">
+  <label>Tìm kiếm<input type="search" id="q" placeholder="Tiêu đề, page, domain"></label>
+  <label>Từ khóa<select id="keyword"><option value="">Tất cả</option></select></label>
+  <label>Thị trường<select id="country"><option value="">Tất cả</option></select></label>
+  <label>Số ngày chạy ≥<input type="number" id="minDays" min="0" value="0"></label>
+  <label>Số ads ≥<input type="number" id="minAds" min="1" value="1"></label>
+  <label class="check"><input type="checkbox" id="onlyShopify"> Chỉ store Shopify</label>
+  <label class="check"><input type="checkbox" id="showNoise"> Hiện mục bị lọc nhiễu</label>
+  <label class="check"><input type="checkbox" id="showStopped"> Hiện ads đã dừng</label>
+</section>
+<div class="wrap">
+  <table>
+    <thead><tr id="head"></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <div class="empty" id="empty" hidden></div>
+</div>
+<script>
+const COLUMNS = [
+  { key: "score", label: "Điểm", sort: true },
+  { key: "title", label: "Sản phẩm / Page" },
+  { key: "n_active", label: "Ads đang chạy", sort: true, num: true },
+  { key: "max_days", label: "Ngày chạy", sort: true, num: true },
+  { key: "new_7d", label: "Mới 7 ngày", sort: true, num: true },
+  { key: "reach", label: "Reach EU", sort: true, num: true },
+  { key: "countries", label: "Thị trường" },
+  { key: "store", label: "Store" },
+];
+const PART_LABELS = { longevity: "Chạy lâu", variants: "Nhiều biến thể", reach: "Reach EU", momentum: "Đang bật thêm" };
+const state = { data: null, sort: "score", desc: true, open: new Set() };
+const $ = (id) => document.getElementById(id);
+
+function el(tag, props = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") node.className = v; else if (k === "text") node.textContent = v; else node.setAttribute(k, v);
+  }
+  for (const child of children) if (child) node.append(child);
+  return node;
+}
+function link(url, text) {
+  // Chỉ nhận link https để dữ liệu ads không chèn được scheme khác.
+  if (!/^https:\/\//i.test(url || "")) return el("span", { text });
+  return el("a", { href: url, target: "_blank", rel: "noopener noreferrer", text });
+}
+const fmt = (n) => (n == null ? "–" : Number(n).toLocaleString("vi-VN"));
+const day = (iso) => (iso ? iso.slice(0, 10) : "–");
+
+function visibleGroups() {
+  const q = $("q").value.trim().toLowerCase();
+  const keyword = $("keyword").value, country = $("country").value;
+  const minDays = Number($("minDays").value) || 0, minAds = Number($("minAds").value) || 1;
+  const rows = state.data.groups.filter((g) => {
+    if (!$("showStopped").checked && g.n_active === 0) return false;
+    if (!$("showNoise").checked && g.excluded) return false;
+    if ($("onlyShopify").checked && !(g.store && g.store.is_shopify)) return false;
+    if (keyword && !g.keywords.includes(keyword)) return false;
+    if (country && !g.countries.includes(country)) return false;
+    if (g.max_days < minDays) return false;
+    if (Math.max(g.n_active, $("showStopped").checked ? g.n_total : 0) < minAds) return false;
+    if (q && ![g.title, g.page_name, g.domain || "", g.body].join(" ").toLowerCase().includes(q)) return false;
+    return true;
+  });
+  const dir = state.desc ? -1 : 1;
+  return rows.sort((a, b) => dir * ((a[state.sort] ?? -1) - (b[state.sort] ?? -1)) || b.score - a.score);
+}
+
+function renderHead() {
+  $("head").replaceChildren(...COLUMNS.map((c) => {
+    const th = el("th", { class: [c.sort ? "sortable" : "", c.num ? "num" : "", state.sort === c.key ? "sorted" : ""].join(" ").trim(),
+      text: c.label + (state.sort === c.key ? (state.desc ? " ↓" : " ↑") : "") });
+    if (c.sort) th.addEventListener("click", () => {
+      if (state.sort === c.key) state.desc = !state.desc; else { state.sort = c.key; state.desc = true; }
+      render();
+    });
+    return th;
+  }));
+}
+
+function storeCell(g) {
+  const td = el("td");
+  if (!g.domain) { td.append(el("span", { class: "sub", text: "–" })); return td; }
+  td.append(link("https://" + g.domain, g.domain));
+  if (g.store && g.store.is_shopify) {
+    td.append(el("div", {}, el("span", { class: "tag", text: "Shopify · " + fmt(g.store.product_count) + " SP" })));
+    if (g.store.product) td.append(el("div", { class: "sub" }, link(g.store.product.url, g.store.product.title),
+      document.createTextNode(g.store.product.price ? " · " + g.store.product.price : "")));
+  } else if (g.store) {
+    td.append(el("div", { class: "sub", text: "Không phải Shopify" }));
+  } else {
+    td.append(el("div", { class: "sub", text: "Chưa kiểm tra" }));
+  }
+  return td;
+}
+
+function detailRow(g) {
+  const parts = el("div");
+  parts.append(el("h3", { text: "Cách tính điểm" }));
+  const present = Object.keys(g.parts);
+  const totalWeight = present.reduce((s, k) => s + state.data.weights[k], 0) || 1;
+  for (const k of present) {
+    const share = Math.round(state.data.weights[k] / totalWeight * 100);
+    const bar = el("div", { class: "bar" }, el("i", { style: "width:" + Math.round(g.parts[k] * 100) + "%" }));
+    parts.append(el("div", { class: "part" }, el("span", { text: PART_LABELS[k] + " (" + share + "%)" }), bar,
+      el("span", { text: Math.round(g.parts[k] * share) + "/" + share })));
+  }
+  if (!("reach" in g.parts) && g.n_active) parts.append(el("div", { class: "sub", text: "Không có số reach nên điểm chia lại cho các tín hiệu còn lại." }));
+  parts.append(el("div", { class: "sub", text: "Page này đang chạy tổng cộng " + fmt(g.page_active_ads) + " ads trong dữ liệu." }));
+
+  const right = el("div");
+  if (g.body) right.append(el("p", { class: "body", text: g.body }));
+  right.append(el("h3", { text: "Các ads (" + g.ads.length + ")" }));
+  const list = el("ul", { class: "adlist" });
+  for (const ad of g.ads) {
+    list.append(el("li", {}, link(ad.snapshot_url, "Xem ad"),
+      document.createTextNode(" · từ " + day(ad.start_at) + " · " + ad.days + " ngày" +
+        (ad.reach ? " · reach " + fmt(ad.reach) : "") + (ad.active ? "" : " · đã dừng"))));
+  }
+  right.append(list);
+  if (g.page_id) right.append(el("p", { class: "sub" }, link("https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=ALL&view_all_page_id=" + encodeURIComponent(g.page_id), "Mở tất cả ads của page trong Ad Library")));
+  return el("tr", { class: "detail" }, el("td", { colspan: String(COLUMNS.length) }, el("div", { class: "detail-grid" }, parts, right)));
+}
+
+function render() {
+  renderHead();
+  const groups = visibleGroups();
+  const rows = [];
+  for (const g of groups) {
+    const scoreCell = el("td", {}, el("div", { class: "score" }, el("b", { text: String(g.score) }),
+      el("div", { class: "bar" }, el("i", { style: "width:" + g.score + "%" }))));
+    const titleCell = el("td", {}, el("div", { class: "title", text: g.title || "(không có tiêu đề)" }),
+      el("div", { class: "sub", text: g.page_name + (g.currency ? " · " + g.currency : "") }));
+    if (g.excluded) titleCell.append(el("span", { class: "tag warn", text: "nhiễu" }));
+    if (g.n_active === 0) titleCell.append(el("span", { class: "tag warn", text: "đã dừng" }));
+    const tr = el("tr", { class: "group" + (g.excluded || g.n_active === 0 ? " dim" : "") }, scoreCell, titleCell,
+      el("td", { class: "num", text: fmt(g.n_active) }), el("td", { class: "num", text: fmt(g.max_days) }),
+      el("td", { class: "num", text: fmt(g.new_7d) }), el("td", { class: "num", text: fmt(g.reach) }),
+      el("td", {}, ...g.countries.map((c) => el("span", { class: "tag", text: c }))), storeCell(g));
+    tr.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return;
+      state.open.has(g.id) ? state.open.delete(g.id) : state.open.add(g.id);
+      render();
+    });
+    rows.push(tr);
+    if (state.open.has(g.id)) rows.push(detailRow(g));
+  }
+  $("rows").replaceChildren(...rows);
+  $("empty").hidden = groups.length > 0;
+  $("empty").textContent = state.data.groups.length
+    ? "Không có sản phẩm nào khớp bộ lọc."
+    : "Chưa có dữ liệu. Chạy: python -m adsfinder collect";
+  const active = state.data.groups.filter((g) => g.n_active && !g.excluded);
+  const stat = (value, label) => el("div", { class: "stat" }, el("b", { text: value }), el("span", { text: label }));
+  $("stats").replaceChildren(
+    stat(fmt(groups.length), "sản phẩm đang hiển thị"),
+    stat(fmt(active.length), "sản phẩm đang chạy"),
+    stat(fmt(state.data.total_ads), "ads đã thu thập"),
+    stat(fmt(active.filter((g) => g.max_days >= 30).length), "chạy từ 30 ngày"),
+    stat(fmt(active.filter((g) => g.n_active >= 5).length), "có từ 5 biến thể"));
+}
+
+function fill(select, values) {
+  for (const v of values) select.append(el("option", { value: v, text: v }));
+}
+
+async function load() {
+  try {
+    const res = await fetch("/api/data");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    state.data = await res.json();
+  } catch (err) {
+    $("meta").textContent = "Không tải được dữ liệu: " + err.message;
+    return;
+  }
+  $("meta").textContent = state.data.last_run
+    ? "Lượt quét gần nhất: " + state.data.last_run.replace("T", " ").slice(0, 16) + " UTC"
+    : "Chưa có lượt quét nào";
+  fill($("keyword"), state.data.keywords);
+  fill($("country"), state.data.countries);
+  render();
+}
+for (const id of ["q", "keyword", "country", "minDays", "minAds", "onlyShopify", "showNoise", "showStopped"]) {
+  $(id).addEventListener("input", () => state.data && render());
+}
+load();
+</script>
+</body>
+</html>
