@@ -27,6 +27,10 @@ CREATE TABLE IF NOT EXISTS stores (
 CREATE TABLE IF NOT EXISTS media (
     ad_id TEXT PRIMARY KEY, file TEXT NOT NULL, is_video INTEGER NOT NULL, captured_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS snapshots (
+    ad_id TEXT NOT NULL, day TEXT NOT NULL, reach INTEGER,
+    PRIMARY KEY (ad_id, day)
+);
 CREATE INDEX IF NOT EXISTS idx_ads_page ON ads(page_id);
 """
 
@@ -69,6 +73,12 @@ def save_ads(conn, ads, keyword, country, run_at):
         conn.execute(
             "INSERT OR IGNORE INTO ad_hits (ad_id, keyword, country) VALUES (?, ?, ?)",
             (ad["id"], keyword, country),
+        )
+        # Mỗi ngày một dòng cho mỗi ad, để vẽ lịch sử số ads và reach.
+        conn.execute(
+            "INSERT INTO snapshots (ad_id, day, reach) VALUES (?, ?, ?) "
+            "ON CONFLICT(ad_id, day) DO UPDATE SET reach = COALESCE(excluded.reach, snapshots.reach)",
+            (ad["id"], run_at[:10], ad["reach"]),
         )
     conn.execute(
         "INSERT INTO queries (keyword, country, last_run) VALUES (?, ?, ?) "

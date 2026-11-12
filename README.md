@@ -90,6 +90,16 @@ python -m adsfinder import file.json --keyword "heated gloves" --country US
 
 File là một danh sách ads, hoặc `{"keyword", "countries", "collected_at", "ads": [...]}`. Mỗi ad cần `id`; các trường nhận được: `page_id`, `page_name`, `ad_creative_link_titles` (hoặc `title`), `ad_creative_bodies` (hoặc `body`), `ad_creative_link_captions` (hoặc `link_url`), `ad_delivery_start_time`, `ad_delivery_stop_time`, `eu_total_reach`, `currency`. Xem ví dụ trong `samples/`.
 
+## Giao diện
+
+- **Lưới thẻ** (mặc định) hoặc **bảng**: mỗi thẻ là một sản phẩm, có ảnh ad, điểm, số ads, số ngày chạy và reach EU.
+- **Bộ lọc**: từ khóa, thị trường, số ngày chạy, số ads, reach EU, store Shopify, có ảnh, video. Sắp xếp theo điểm, ngày chạy, số ads, reach, số ads mới bật, hoặc mới xuất hiện.
+- **Chi tiết**: bấm vào thẻ để xem cách tính điểm, biểu đồ số ads và reach theo ngày, nội dung quảng cáo, store và link từng ad.
+- **Trang theo page**: bấm tên page để xem mọi sản phẩm page đó đang chạy, kèm sản phẩm mới nhất của store nếu là Shopify.
+- **Lưu sản phẩm**: bấm ☆ để lưu. Danh sách lưu nằm trong trình duyệt của bạn (localStorage), nên không đồng bộ giữa các máy.
+
+Biểu đồ theo ngày cần ít nhất 2 lượt quét ở 2 ngày khác nhau.
+
 ## Cách chấm điểm
 
 Meta không công bố chi tiêu, nên điểm (0–100) dựa trên tín hiệu gián tiếp. Các ads cùng page và cùng tiêu đề được gom thành một sản phẩm.

@@ -60,6 +60,9 @@ def build_groups(conn, exclude_terms=()):
         hits[r["ad_id"]].append((r["keyword"], r["country"]))
     stores = {r["domain"]: r for r in conn.execute("SELECT * FROM stores")}
     media = {r["ad_id"]: r for r in conn.execute("SELECT * FROM media")}
+    snapshots = defaultdict(dict)
+    for r in conn.execute("SELECT ad_id, day, reach FROM snapshots"):
+        snapshots[r["ad_id"]][r["day"]] = r["reach"]
     # Khớp theo nguyên từ để "spa" không dính "space".
     terms = [re.escape(t.strip().lower()) for t in exclude_terms if t.strip()]
     exclude = re.compile(r"\b(?:" + "|".join(terms) + r")\b") if terms else None
@@ -97,8 +100,20 @@ def build_groups(conn, exclude_terms=()):
         domain = domains[0][0] if domains else None
         page_name = ads[0]["page_name"]
         haystack = " ".join([title[0][0] if title else "", page_name, body]).lower()
+        days = defaultdict(lambda: {"ads": 0, "reach": 0, "has_reach": False})
+        for a in ads:
+            for day, day_reach in snapshots.get(a["id"], {}).items():
+                days[day]["ads"] += 1
+                if day_reach:
+                    days[day]["reach"] += day_reach
+                    days[day]["has_reach"] = True
         group = {
             "id": ads[0]["id"],
+            "key": f"{page}|{title_key(ads[0]['title'], ads[0]['body'])}",
+            "page_key": page,
+            "history": [{"day": day, "ads": v["ads"], "reach": v["reach"] if v["has_reach"] else None}
+                        for day, v in sorted(days.items())],
+            "first_start": min((a["start_at"] for a in ads if a["start_at"]), default=None),
             "title": title[0][0] if title else "",
             "body": body[:400],
             "page_id": ads[0]["page_id"],
@@ -133,9 +148,14 @@ def build_groups(conn, exclude_terms=()):
         if store:
             products = json.loads(store["products"] or "[]")
             match = match_product(group["title"], products) if store["is_shopify"] else None
+            newest = sorted(products, key=lambda p: p.get("created_at") or "", reverse=True)[:6]
             group["store"] = {
                 "is_shopify": bool(store["is_shopify"]),
                 "product_count": store["product_count"],
+                "recent_products": [
+                    {"title": p["title"], "price": p["price"], "created_at": p["created_at"],
+                     "url": f"https://{domain}/products/{p['handle']}"} for p in newest
+                ],
                 "product": match and {
                     "title": match["title"], "price": match["price"], "created_at": match["created_at"],
                     "url": f"https://{domain}/products/{match['handle']}",

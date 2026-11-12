@@ -70,6 +70,17 @@ class GroupTest(unittest.TestCase):
         self.assertEqual(wrap["max_days"], 41)
         self.assertEqual(wrap["page_active_ads"], 3)
         self.assertEqual(wrap["countries"], ["DE"])
+        self.assertEqual(wrap["history"], [{"day": "2026-11-10", "ads": 2, "reach": None},
+                                           {"day": "2026-11-11", "ads": 2, "reach": None}])
+
+    def test_history_sums_reach_per_day(self):
+        db.save_ads(self.conn, [ad("1", eu_total_reach=1000), ad("2", eu_total_reach=500)], "kw", "DE", RUN1)
+        db.save_ads(self.conn, [ad("1", eu_total_reach=1000), ad("2", eu_total_reach=500)], "kw", "FR", RUN1)
+        db.save_ads(self.conn, [ad("1", eu_total_reach=1800)], "kw", "DE", RUN2)
+        group = build_groups(self.conn)[0]
+        self.assertEqual(group["history"], [{"day": "2026-11-10", "ads": 2, "reach": 1500},
+                                            {"day": "2026-11-11", "ads": 1, "reach": 1800}])
+        self.assertEqual(group["key"], "1|red light wrap")
 
     def test_stopped_group_scores_zero(self):
         db.save_ads(self.conn, [ad("1")], "kw", "DE", RUN1)
