@@ -18,7 +18,47 @@ MOMENTUM_FULL = 5             # 5 ads mới trong 7 ngày được trọn điể
 MOMENTUM_MIN_AGE_DAYS = 14    # chỉ tính "bật thêm" khi sản phẩm đã chạy ít nhất 14 ngày
 REACH_LOG_RANGE = (3, 6)      # reach 1.000 -> 0 điểm, 1.000.000 -> trọn điểm
 
+BIG_STORE_PRODUCTS = 250      # /products.json trả tối đa 250: chạm mức này là store lớn
+BIG_PAGE_ADS = 100            # page chạy quá nhiều ads thường là thương hiệu lớn
+
 SPACE_RE = re.compile(r"\s+")
+
+# Gắn nhãn ngách theo từ trong tiêu đề, nội dung và tên sản phẩm (khớp đầu từ).
+NICHES = {
+    "Sức khỏe": ["pain", "relief", "posture", "massag", "therapy", "knee", "back", "neck", "joint", "sleep", "snor",
+                 "brace", "orthop", "red light", "infrared", "heated", "arthrit", "carpal", "schmerz", "rücken", "douleur", "pijn", "dolor", "dolore", "gesund", "santé"],
+    "Làm đẹp": ["skin", "face", "hair", "beauty", "serum", "wrinkle", "lash", "nail", "makeup", "led mask", "haut",
+                "haar", "peau", "cheveu", "huid", "piel", "pelle", "capelli", "beauté", "schönheit"],
+    "Thú cưng": ["dog", "cat", "pet", "puppy", "kitten", "hund", "katze", "chien", "chat", "hond", "perro", "gato",
+                 "cane", "gatto"],
+    "Nhà cửa & bếp": ["kitchen", "home", "clean", "storage", "lamp", "garden", "sofa", "bed", "pillow",
+                      "blanket", "küche", "garten", "cuisine", "maison", "jardin", "keuken", "tuin", "cocina", "hogar",
+                      "cucina", "casa"],
+    "Mẹ & bé": ["baby", "kid", "child", "toddler", "toy", "mom", "kinder", "spielzeug", "bébé", "enfant", "jouet",
+                "speelgoed", "bebé", "niño", "bambin", "giocattol"],
+    "Thời trang": ["dress", "shoe", "sneaker", "bag", "jacket", "shirt", "legging", "bra", "jewel", "watch", "ring",
+                   "necklace", "kleid", "schuh", "tasche", "robe", "chaussure", "sac", "jurk", "schoen", "vestido",
+                   "zapato", "scarpe", "borsa"],
+    "Thể thao": ["fitness", "gym", "yoga", "workout", "running", "bike", "golf", "fishing", "camping", "hiking",
+                 "sport", "training"],
+    "Xe & dụng cụ": ["car", "auto", "tool", "drill", "garage", "motor", "werkzeug", "voiture", "outil", "gereedschap",
+                     "coche", "herramienta", "attrezz"],
+    "Điện tử": ["phone", "charger", "earbud", "headphone", "camera", "drone", "projector", "speaker", "smart", "usb",
+                "bluetooth", "wireless", "gadget"],
+}
+NICHE_RES = {name: re.compile(r"\b(?:" + "|".join(re.escape(w) for w in words) + ")") for name, words in NICHES.items()}
+OTHER_NICHE = "Khác"
+
+
+def classify_niche(text):
+    """Ngách có nhiều từ khớp nhất; hòa thì lấy ngách đứng trước trong NICHES."""
+    text = (text or "").lower()
+    best, best_hits = OTHER_NICHE, 0
+    for name, pattern in NICHE_RES.items():
+        hits = len(pattern.findall(text))
+        if hits > best_hits:
+            best, best_hits = name, hits
+    return best
 
 
 def clamp(value):
@@ -127,7 +167,8 @@ def build_groups(conn, exclude_terms=()):
             "score": score,
             "parts": parts,
             "countries": sorted({c for a in ads for _, c in a["hits"]}),
-            "keywords": sorted({k for a in ads for k, _ in a["hits"]}),
+            "keywords": sorted({k for a in ads for k, _ in a["hits"] if not k.startswith("@")}),
+            "tracked_page": any(k.startswith("@page:") for a in ads for k, _ in a["hits"]),
             "currency": Counter(a["currency"] for a in ads if a["currency"]).most_common(1)[0][0]
             if any(a["currency"] for a in ads) else "",
             "domain": domain,
@@ -161,6 +202,11 @@ def build_groups(conn, exclude_terms=()):
                     "url": f"https://{domain}/products/{match['handle']}",
                 },
             }
+        store_info = group["store"] or {}
+        product_title = (store_info.get("product") or {}).get("title", "")
+        group["niche"] = classify_niche(" ".join([group["title"], product_title, body]))
+        group["big_brand"] = (page_active[page] > BIG_PAGE_ADS
+                              or (store_info.get("product_count") or 0) >= BIG_STORE_PRODUCTS)
         groups.append(group)
     groups.sort(key=lambda g: (g["score"], g["n_active"], g["max_days"]), reverse=True)
     return groups

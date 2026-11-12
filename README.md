@@ -22,22 +22,44 @@ Mở http://127.0.0.1:8765. Dữ liệu mẫu là 50 ads thật cho từ khóa "
 2. Lấy token Meta và điền vào `.env` (xem mục dưới).
 3. Chạy:
    ```bash
-   python -m adsfinder collect    # lấy ads đang chạy
+   python -m adsfinder discover   # tự tìm ads, không cần từ khóa (xem mục "Tự tìm ads")
    python -m adsfinder enrich     # kiểm tra store nào là Shopify
    python -m adsfinder capture    # chụp ảnh ad (tùy chọn, xem mục "Ảnh ad")
    python -m adsfinder serve      # mở giao diện web
    python -m adsfinder export     # xuất data/ranking.csv
    ```
 
-Chạy `collect` mỗi ngày một lần. Tool so sánh các lượt quét để biết ad nào còn sống và page nào đang bật thêm ads, nên dữ liệu càng nhiều ngày thì điểm càng đáng tin.
+Chạy `discover` mỗi ngày một lần. Tool so sánh các lượt quét để biết ad nào còn sống và page nào đang bật thêm ads, nên dữ liệu càng nhiều ngày thì điểm càng đáng tin.
 
 Đặt lịch trên macOS/Linux (9 giờ sáng hằng ngày):
 
 ```
-0 9 * * * cd /đường/dẫn/ads-finder && python -m adsfinder collect && python -m adsfinder enrich
+0 9 * * * cd /đường/dẫn/ads-finder && python -m adsfinder discover && python -m adsfinder enrich
 ```
 
 Trên Windows dùng Task Scheduler với cùng hai lệnh.
+
+## Tự tìm ads
+
+API của Meta bắt buộc mỗi lượt tìm phải có từ khóa hoặc ID page. `discover` tự tạo các truy vấn đó từ ba nguồn và xoay vòng chúng qua các ngày:
+
+1. **Cụm từ bán hàng** dùng chung cho mọi ngách ("free shipping", "kostenloser versand", "livraison gratuite"...), theo ngôn ngữ từng nước trong `countries`. Danh sách nằm ở đầu file `adsfinder/discovery.py`.
+2. **Page đã biết**: page nào dẫn về một store Shopify cỡ nhỏ thì được theo dõi, và mỗi lượt tool lấy toàn bộ ads của page đó. Cần `enrich` chạy trước một lượt để biết store nào là Shopify.
+3. **Từ khóa tự sinh**: cụm 2–3 từ rút từ tên sản phẩm của các ads điểm cao, dùng làm từ khóa cho lượt sau.
+
+Từ khóa trong `keywords` của config (nếu có) luôn được chạy trước. Lệnh `collect` cũ vẫn dùng được khi chỉ muốn tìm theo từ khóa tự nhập.
+
+| Cấu hình | Mặc định | Ý nghĩa |
+|---|---|---|
+| `max_calls_per_run` | 120 | Số lượt gọi API tối đa mỗi lần chạy; phần chưa chạy để lượt sau |
+| `max_tracked_pages` | 300 | Số page Shopify được theo dõi |
+| `auto_keywords_per_run` | 10 | Số từ khóa tự sinh thêm mỗi lượt |
+| `max_auto_keywords` | 300 | Tổng số từ khóa tự sinh |
+| `auto_keyword_min_score` | 30 | Điểm tối thiểu của sản phẩm để rút từ khóa |
+
+Kết quả tìm theo page hoặc theo từ khóa tự sinh gộp mọi nước trong config, nên thị trường hiển thị là `EU`.
+
+Mỗi sản phẩm được gắn một **ngách** (sức khỏe, làm đẹp, thú cưng...) theo từ trong tiêu đề, và bị đánh dấu **thương hiệu lớn** khi page chạy hơn 100 ads hoặc store có từ 250 sản phẩm. Thương hiệu lớn bị ẩn mặc định trên giao diện. Danh sách từ của từng ngách và hai ngưỡng này nằm ở đầu file `adsfinder/scoring.py`.
 
 ## Ảnh ad
 
@@ -52,7 +74,7 @@ playwright install chromium
 
 ## Chạy tự động miễn phí trên GitHub
 
-File `.github/workflows/daily-scan.yml` chạy `collect`, `enrich`, `capture` mỗi ngày trên GitHub Actions rồi đăng trang web lên GitHub Pages. Repo công khai thì cả hai đều miễn phí.
+File `.github/workflows/daily-scan.yml` chạy `discover`, `enrich`, `capture` mỗi ngày trên GitHub Actions rồi đăng trang web lên GitHub Pages. Repo công khai thì cả hai đều miễn phí.
 
 Cài đặt một lần trong repo này:
 

@@ -43,6 +43,7 @@ def build_payload(conn, exclude_terms):
         "weights": WEIGHTS,
         "keywords": sorted({k for g in groups for k in g["keywords"]}),
         "countries": sorted({c for g in groups for c in g["countries"]}),
+        "niches": sorted({g["niche"] for g in groups}),
         "total_ads": sum(g["n_total"] for g in groups),
         "groups": groups,
     }

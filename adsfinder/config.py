@@ -13,6 +13,12 @@ DEFAULTS = {
     "db_path": "data/ads.db",
     "port": 8765,
     "images_top_groups": 60,
+    # Tự tìm (lệnh discover)
+    "max_calls_per_run": 120,
+    "max_tracked_pages": 300,
+    "auto_keywords_per_run": 10,
+    "max_auto_keywords": 300,
+    "auto_keyword_min_score": 30,
 }
 
 

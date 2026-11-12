@@ -59,6 +59,7 @@ class ScoreTest(unittest.TestCase):
 class GroupTest(unittest.TestCase):
     def setUp(self):
         self.conn = db.connect(":memory:")
+        self.addCleanup(self.conn.close)
 
     def test_grouping_and_active_status(self):
         db.save_ads(self.conn, [ad("1"), ad("2"), ad("3", title="Other")], "kw", "DE", RUN1)
@@ -149,6 +150,102 @@ class SiteTest(unittest.TestCase):
             self.assertEqual((groups["Red Light Wrap"]["image"], groups["Red Light Wrap"]["is_video"]), ("1.jpg", True))
             self.assertIsNone(groups["Other"]["image"])
             self.assertTrue((out / "index.html").exists())
+
+
+class FakeMeta:
+    """Meta API giả: trả ads theo search_terms hoặc search_page_ids, ghi lại các lượt gọi."""
+
+    def __init__(self, by_term=None, by_page=None, fail_code=None):
+        self.by_term, self.by_page, self.fail_code, self.calls = by_term or {}, by_page or {}, fail_code, []
+
+    def __call__(self, url):
+        from urllib.parse import parse_qs, urlparse
+
+        from adsfinder.meta_api import MetaApiError
+        q = {k: v[0] for k, v in parse_qs(urlparse(url).query).items()}
+        self.calls.append(q)
+        if self.fail_code:
+            raise MetaApiError("lỗi giả", self.fail_code)
+        if "search_page_ids" in q:
+            return {"data": [a for pid in q["search_page_ids"].split(",") for a in self.by_page.get(pid, [])]}
+        return {"data": self.by_term.get(q["search_terms"], [])}
+
+
+def raw(ad_id, title, page, domain=None, start="2026-09-01"):
+    return {"id": ad_id, "page_id": page, "page_name": "Page " + page, "ad_creative_link_titles": [title],
+            "ad_creative_link_captions": [domain] if domain else [], "ad_delivery_start_time": start}
+
+
+class DiscoveryTest(unittest.TestCase):
+    def setUp(self):
+        from adsfinder.config import DEFAULTS
+        self.conn = db.connect(":memory:")
+        self.addCleanup(self.conn.close)
+        self.cfg = {**DEFAULTS, "countries": ["DE", "FR"], "max_pages_per_query": 1}
+
+    def run_day(self, fake, run_at, **cfg):
+        from adsfinder import discovery
+        return discovery.run(self.conn, {**self.cfg, **cfg}, "TOKEN", run_at, fetch=fake, log=lambda *_: None)
+
+    def test_product_term(self):
+        from adsfinder.discovery import product_term
+        self.assertEqual(product_term("30% OFF — Red Light Waist Wrap Pro"), "red light waist")
+        self.assertEqual(product_term("Kostenloser Versand für das Nackenkissen Deluxe"), "kostenloser versand nackenkissen")
+        self.assertIsNone(product_term("50% OFF Sale"))
+
+    def test_phrases_rotate_within_budget(self):
+        fake = FakeMeta()
+        stats = self.run_day(fake, RUN1, max_calls_per_run=4)
+        self.assertEqual(stats["queries"], 4)
+        first = [(c["search_terms"], c["ad_reached_countries"]) for c in fake.calls]
+        self.assertEqual(first[:2], [("kostenloser versand", '["DE"]'), ("livraison gratuite", '["FR"]')])
+        fake2 = FakeMeta()
+        self.run_day(fake2, RUN2, max_calls_per_run=4)
+        second = [(c["search_terms"], c["ad_reached_countries"]) for c in fake2.calls]
+        self.assertFalse(set(first) & set(second), "lượt sau phải chạy các cụm từ chưa chạy")
+
+    def test_shopify_pages_get_tracked_and_keywords_expand(self):
+        wrap = raw("1", "Red Light Waist Wrap", "77", "store.com")
+        fake = FakeMeta(by_term={"kostenloser versand": [wrap, raw("2", "Big Brand Shoe", "88", "big.com")]})
+        self.run_day(fake, RUN1)
+        db.save_store(self.conn, "store.com", {"is_shopify": True, "product_count": 12, "products": [
+            {"title": "Red Light Waist Wrap", "handle": "wrap", "price": "59", "created_at": None}]}, RUN1)
+        db.save_store(self.conn, "big.com", {"is_shopify": True, "product_count": 250, "products": []}, RUN1)
+
+        # Ngày 2: page 77 được theo dõi và lộ ra một sản phẩm không khớp cụm từ nào.
+        fake2 = FakeMeta(by_page={"77": [wrap, raw("3", "Infrared Knee Pad", "77", "store.com", start="2026-11-09")]})
+        stats = self.run_day(fake2, RUN2)
+        self.assertEqual(stats["tracked_pages"], 1)
+        self.assertEqual(stats["auto_keywords_added"], ["red light waist"])
+        page_calls = [c for c in fake2.calls if "search_page_ids" in c]
+        self.assertEqual([(c["search_page_ids"], c["ad_reached_countries"]) for c in page_calls], [("77", '["DE", "FR"]')])
+        self.assertIn("red light waist", [c.get("search_terms") for c in fake2.calls])
+        groups = {g["title"]: g for g in build_groups(self.conn)}
+        knee = groups["Infrared Knee Pad"]
+        self.assertEqual((knee["n_active"], knee["countries"], knee["keywords"], knee["tracked_page"]), (1, ["EU"], [], True))
+        self.assertEqual((knee["niche"], groups["Big Brand Shoe"]["big_brand"], knee["big_brand"]), ("Sức khỏe", True, False))
+
+        # Ngày 3: page không còn chạy ad "Knee Pad" nữa thì ad đó chuyển sang đã dừng.
+        self.run_day(FakeMeta(by_page={"77": [wrap]}), "2026-11-12T00:00:00+00:00")
+        groups = {g["title"]: g for g in build_groups(self.conn)}
+        self.assertEqual((groups["Infrared Knee Pad"]["n_active"], groups["Red Light Waist Wrap"]["n_active"]), (0, 1))
+
+    def test_rate_limit_stops_early_and_bad_token_raises(self):
+        from adsfinder.meta_api import MetaApiError
+        fake = FakeMeta(fail_code=613)
+        self.assertEqual(self.run_day(fake, RUN1)["queries"], 0)
+        self.assertEqual(len(fake.calls), 1)
+        bad = FakeMeta(fail_code=190)
+        with self.assertRaises(MetaApiError):
+            self.run_day(bad, RUN1)
+        self.assertEqual(len(bad.calls), 3)
+
+    def test_truncated_page_batch_does_not_mark_pages_stopped(self):
+        from adsfinder.meta_api import search
+        pages = [{"data": [{"id": "1"}], "paging": {"next": "n"}}]
+        ads, truncated = search("T", countries=["DE"], page_ids=["77", "78"], max_pages=1, fetch=lambda url: pages[0])
+        self.assertEqual((len(ads), truncated), (1, True))
+
 
 if __name__ == "__main__":
     unittest.main()

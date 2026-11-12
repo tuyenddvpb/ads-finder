@@ -31,6 +31,13 @@ CREATE TABLE IF NOT EXISTS snapshots (
     ad_id TEXT NOT NULL, day TEXT NOT NULL, reach INTEGER,
     PRIMARY KEY (ad_id, day)
 );
+CREATE TABLE IF NOT EXISTS terms (
+    term TEXT NOT NULL, country TEXT NOT NULL, source TEXT NOT NULL, added_at TEXT NOT NULL,
+    PRIMARY KEY (term, country)
+);
+CREATE TABLE IF NOT EXISTS pages (
+    page_id TEXT PRIMARY KEY, page_name TEXT, domain TEXT, tracked INTEGER NOT NULL, updated_at TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS idx_ads_page ON ads(page_id);
 """
 
@@ -105,3 +112,19 @@ def save_media(conn, ad_id, file, is_video, captured_at):
         (ad_id, file, int(is_video), captured_at),
     )
     conn.commit()
+
+
+def add_term(conn, term, country, source, added_at):
+    """Thêm một từ khóa tìm kiếm. Trả về True nếu là từ mới."""
+    cur = conn.execute(
+        "INSERT OR IGNORE INTO terms (term, country, source, added_at) VALUES (?, ?, ?, ?)",
+        (term, country, source, added_at),
+    )
+    return cur.rowcount > 0
+
+
+def save_page(conn, page_id, page_name, domain, tracked, updated_at):
+    conn.execute(
+        "INSERT OR REPLACE INTO pages (page_id, page_name, domain, tracked, updated_at) VALUES (?, ?, ?, ?, ?)",
+        (page_id, page_name, domain, int(tracked), updated_at),
+    )

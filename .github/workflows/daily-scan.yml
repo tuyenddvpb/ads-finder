@@ -55,7 +55,7 @@ jobs:
 
       - name: Thu thập ads
         if: ${{ !inputs.demo }}
-        run: python -m adsfinder collect
+        run: python -m adsfinder discover
 
       - name: Kiểm tra store Shopify
         if: ${{ !inputs.demo }}

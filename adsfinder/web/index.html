@@ -152,6 +152,7 @@ details.data th, details.data td { padding: 4px 10px; }
   <div class="row">
     <label>Tìm kiếm<input type="search" id="q" placeholder="Tiêu đề, page, domain"></label>
     <label>Từ khóa<select id="keyword"><option value="">Tất cả</option></select></label>
+    <label>Ngách<select id="niche"><option value="">Tất cả</option></select></label>
     <label>Thị trường<select id="country"><option value="">Tất cả</option></select></label>
     <label>Ngày chạy ≥<input type="number" id="minDays" min="0" value="0"></label>
     <label>Số ads ≥<input type="number" id="minAds" min="1" value="1"></label>
@@ -170,6 +171,7 @@ details.data th, details.data td { padding: 4px 10px; }
     <button class="chip" data-flag="image" aria-pressed="false">Có ảnh</button>
     <button class="chip" data-flag="video" aria-pressed="false">Video</button>
     <button class="chip" data-flag="saved" aria-pressed="false">★ Đã lưu</button>
+    <button class="chip" data-flag="big" aria-pressed="false">Hiện thương hiệu lớn</button>
     <button class="chip" data-flag="noise" aria-pressed="false">Hiện mục nhiễu</button>
     <button class="chip" data-flag="stopped" aria-pressed="false">Hiện ads đã dừng</button>
     <span class="spacer"></span>
@@ -192,7 +194,7 @@ details.data th, details.data td { padding: 4px 10px; }
 const PART_LABELS = { longevity: "Chạy lâu", variants: "Nhiều biến thể", reach: "Reach EU", momentum: "Đang bật thêm" };
 const SAVED_KEY = "adsfinder.saved";
 const state = { data: null, view: "grid", page: null,
-  flags: { shopify: false, image: false, video: false, saved: false, noise: false, stopped: false },
+  flags: { shopify: false, image: false, video: false, saved: false, big: false, noise: false, stopped: false },
   saved: new Set() };
 const $ = (id) => document.getElementById(id);
 const SVG = "http://www.w3.org/2000/svg";
@@ -239,13 +241,15 @@ function toggleSaved(key) {
 
 function visibleGroups() {
   const q = $("q").value.trim().toLowerCase();
-  const keyword = $("keyword").value, country = $("country").value, sort = $("sort").value;
+  const keyword = $("keyword").value, country = $("country").value, niche = $("niche").value, sort = $("sort").value;
   const minDays = Number($("minDays").value) || 0, minAds = Number($("minAds").value) || 1, minReach = Number($("minReach").value) || 0;
   const f = state.flags;
   const rows = state.data.groups.filter((g) => {
     if (state.page && g.page_key !== state.page) return false;
     if (!f.stopped && g.n_active === 0) return false;
     if (!f.noise && g.excluded) return false;
+    if (!f.big && g.big_brand) return false;
+    if (niche && g.niche !== niche) return false;
     if (f.shopify && !(g.store && g.store.is_shopify)) return false;
     if (f.image && !g.image) return false;
     if (f.video && !g.is_video) return false;
@@ -289,7 +293,9 @@ function card(g) {
 
   const title = el("button", { class: "card-title", text: g.title || "(không có tiêu đề)" });
   title.addEventListener("click", () => openDetail(g));
-  const tags = el("div", { class: "tags" }, ...g.countries.map((c) => el("span", { class: "tag plain", text: c })));
+  const tags = el("div", { class: "tags" }, el("span", { class: "tag plain", text: g.niche }),
+    ...g.countries.map((c) => el("span", { class: "tag plain", text: c })));
+  if (g.big_brand) tags.append(el("span", { class: "tag warn", text: "thương hiệu lớn" }));
   if (g.store && g.store.is_shopify) tags.append(el("span", { class: "tag", text: "Shopify" }));
   if (g.store && g.store.product && g.store.product.price) tags.append(el("span", { class: "tag", text: g.store.product.price }));
   if (g.new_7d && g.max_days >= 14) tags.append(el("span", { class: "tag", text: "+" + g.new_7d + " ads mới" }));
@@ -520,15 +526,16 @@ async function load() {
     $("meta").textContent = "Không tải được dữ liệu: " + err.message;
     return;
   }
-  const active = state.data.groups.filter((g) => g.n_active && !g.excluded);
+  const active = state.data.groups.filter((g) => g.n_active && !g.excluded && !g.big_brand);
   $("meta").textContent = (state.data.last_run ? "Quét gần nhất: " + state.data.last_run.replace("T", " ").slice(0, 16) + " UTC" : "Chưa có lượt quét nào")
     + " · " + fmt(active.length) + " sản phẩm đang chạy · " + fmt(state.data.total_ads) + " ads";
   fill($("keyword"), state.data.keywords);
   fill($("country"), state.data.countries);
+  fill($("niche"), state.data.niches || []);
   render();
 }
 
-for (const id of ["q", "keyword", "country", "minDays", "minAds", "minReach", "sort"]) $(id).addEventListener("input", () => state.data && render());
+for (const id of ["q", "keyword", "niche", "country", "minDays", "minAds", "minReach", "sort"]) $(id).addEventListener("input", () => state.data && render());
 for (const chip of document.querySelectorAll(".chip")) chip.addEventListener("click", () => {
   state.flags[chip.dataset.flag] = !state.flags[chip.dataset.flag]; if (state.data) render();
 });

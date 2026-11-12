@@ -13,6 +13,7 @@ from .config import load_config, load_env
 from .meta_api import MetaApiError, search_ads
 from .normalize import normalize_ad, to_iso
 from .scoring import build_groups
+from . import discovery
 from .capture import CaptureUnavailable, capture_ads
 from .server import build_site, images_dir, serve
 from .shopify import check_store
@@ -50,6 +51,22 @@ def cmd_collect(cfg, args):
     conn.close()
     if failed:
         sys.exit(f"{failed} truy vấn lỗi.")
+
+
+def cmd_discover(cfg, args):
+    token = os.environ.get("META_ACCESS_TOKEN", "").strip()
+    if not token:
+        sys.exit("Thiếu META_ACCESS_TOKEN. Sao chép .env.example thành .env rồi điền token.")
+    if args.max_calls:
+        cfg = {**cfg, "max_calls_per_run": args.max_calls}
+    conn = db.connect(cfg["db_path"])
+    try:
+        stats = discovery.run(conn, cfg, token, now_iso())
+    except MetaApiError as exc:
+        sys.exit(f"Dừng vì các truy vấn đầu tiên đều lỗi: {exc}")
+    finally:
+        conn.close()
+    print(f"Xong: {stats['queries']} truy vấn, {stats['ads']} ads, {stats['new']} mới, {stats['failed']} lỗi.")
 
 
 def cmd_import(cfg, args):
@@ -165,6 +182,10 @@ def main(argv=None):
     p.add_argument("--keyword", action="append", help="Ghi đè từ khóa trong config; dùng nhiều lần được")
     p.add_argument("--country", action="append", help="Mã quốc gia ISO-2; dùng nhiều lần được")
     p.set_defaults(func=cmd_collect)
+
+    p = sub.add_parser("discover", help="Tự tìm ads: cụm từ bán hàng, page Shopify đã biết, từ khóa tự sinh")
+    p.add_argument("--max-calls", type=int, help="Số lượt gọi API tối đa cho lần chạy này")
+    p.set_defaults(func=cmd_discover)
 
     p = sub.add_parser("import", help="Nhập ads từ file JSON (dùng cho nguồn US hoặc bên thứ ba)")
     p.add_argument("file")
